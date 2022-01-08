@@ -25,12 +25,12 @@ def lambda_handler(event, context):
     # check if message is a ping
     body = event.get('body-json')
     
-    if utils.ping_pong(body):
-        return utils.PING_PONG
+    if ping_pong(body):
+        return PING_PONG
 
     # return dummy
     return {
-        "type": utils.RESPONSE_TYPES.MESSAGE_WITH_SOURCE,
+        "type": RESPONSE_TYPES.MESSAGE_WITH_SOURCE,
         "data": {
             "tts": False,
             "content": "BEEP BOOP",
