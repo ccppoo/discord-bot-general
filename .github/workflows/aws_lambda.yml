@@ -1,0 +1,75 @@
+# ******************************************************** #
+# V2 of the AWS Lambda Deploy workflow adds caching the Docker image on AWS ECR so
+# subsequent runs of the workflow doesn't require rebuilding the image from scratch.
+# The Dockerfile is simple in this example, but a more production-grade Dockerfile
+# with linux packages to install, a lengthier requirements.txt file, etc. will
+# benenfit greatly from image caching.
+# ******************************************************** #
+
+# 이 작업은 이미지를 새로 만들지 않고, AWS ECR에서 또 다른 이름으로 레포를 만들어서
+# 이전에 만든 이미지를 저장함
+# 저장한 이미지는 캐시 용도로 사용되고, 빌드를 하는데 사용된다.
+
+name: AWS Lambda Deploy V2
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # trigger manually
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      # 매번 새로운 버전을 배포할 때 붙이는 태그(이건 git, github Push를 할 때 붙이는 태그와 동일함!)
+      ECR_IMAGE_TAG: latest
+      # aws 서울 리전, 다른 경우 수정하시오!
+      AWS_DEFAULT_REGION: ap-northeast-2
+      # 실제로 aws console에서 볼 수 있는(만든) 람다 이름
+      AWS_LAMBDA_FUNC_NAME: discord-bot-with-webhook
+      # 빌드한 image 파일을 버전관리하는 레포지토리 이름
+      AWS_ECR_REPOSITORY_NAME: discord-bot-with-webhook-ecr
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-deploy-image
+      uses: whoan/docker-build-with-cache-action@v5
+      with:
+        username: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        password: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        registry: ${{ steps.login-ecr.outputs.registry }}
+        image_name: ${{ env.AWS_ECR_REPOSITORY_NAME }}
+        build_extra_args: >-
+          --build-arg DISCORD_PUBLIC_KEY=${{ secrets.DISCORD_PUBLIC_KEY }}
+          --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          --build-arg AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
+        push_image_and_stages: true
+    
+    - name: Deploy to AWS Lambda
+      run: |
+        aws lambda update-function-code \
+        --function-name ${{ env.AWS_LAMBDA_FUNC_NAME }} \
+        --image-uri "${{ secrets.AWS_ECR_IMAGE_URI }}:${{ env.ECR_IMAGE_TAG }}"
+      env:
+        DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
