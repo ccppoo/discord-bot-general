@@ -1,13 +1,7 @@
 import json
 import os
-
-print("Name is ({})".format(__name__))
-print(f"file name {__file__}")
-print(f"{os.getcwd()}")
-
-from .validator import verify_signature
-from .utils import PING_PONG, RESPONSE_TYPES
-from .utils import ping_pong
+import validator
+import utils 
 
 
 
@@ -23,19 +17,19 @@ def lambda_handler(event, context):
 
     # verify the signature
     try:
-        verify_signature(event, PUBLIC_KEY)
+        validator.verify_signature(event, PUBLIC_KEY)
     except Exception as e:
         raise Exception(f"[UNAUTHORIZED] Invalid request signature: {e}")
 
     # check if message is a ping
     body = event.get('body-json')
     
-    if ping_pong(body):
-        return PING_PONG
+    if utils.ping_pong(body):
+        return utils.PING_PONG
 
     # return dummy
     return {
-        "type": RESPONSE_TYPES.MESSAGE_WITH_SOURCE,
+        "type": utils.RESPONSE_TYPES.MESSAGE_WITH_SOURCE,
         "data": {
             "tts": False,
             "content": "BEEP BOOP",
