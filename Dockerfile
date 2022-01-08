@@ -23,4 +23,4 @@ ENV AWS_DEFAULT_REGION $AWS_DEFAULT_REGION
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 # app은 app.py를 의미, handler는 app.py의 handler 함수를 의미함
-CMD [ "app.handler" ]
+CMD [ "app.lambda_handler" ]
