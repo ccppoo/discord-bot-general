@@ -1,8 +1,8 @@
 import json
 import os
-from validator import verify_signature
-from utils import PING_PONG, RESPONSE_TYPES
-from utils import ping_pong
+from .validator import verify_signature
+from .utils import PING_PONG, RESPONSE_TYPES
+from .utils import ping_pong
 
 # running in Python version 3.8
 
