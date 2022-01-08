@@ -1,8 +1,9 @@
 import json
 import os
-import validator
-import utils 
 
+from validator import verify_signature
+from utils import PING_PONG, RESPONSE_TYPES
+from utils import ping_pong
 
 
 # running in Python version 3.8
@@ -17,7 +18,7 @@ def lambda_handler(event, context):
 
     # verify the signature
     try:
-        validator.verify_signature(event, PUBLIC_KEY)
+        verify_signature(event, PUBLIC_KEY)
     except Exception as e:
         raise Exception(f"[UNAUTHORIZED] Invalid request signature: {e}")
 
