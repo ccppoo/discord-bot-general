@@ -4,6 +4,8 @@ from .validator import verify_signature
 from .utils import PING_PONG, RESPONSE_TYPES
 from .utils import ping_pong
 
+print("Name is ({})".format(__name__))
+
 # running in Python version 3.8
 
 # docker, github action에서 사용되는 {{ secrets. }} 이것도 aws_lambda.yml에서 환경변수와 함께 배포되고
