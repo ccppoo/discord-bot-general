@@ -2,6 +2,8 @@ import json
 import os
 
 print("Name is ({})".format(__name__))
+print(f"file name {__file__}")
+print(f"{os.getcwd()}")
 
 from .validator import verify_signature
 from .utils import PING_PONG, RESPONSE_TYPES
