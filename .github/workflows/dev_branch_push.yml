@@ -34,9 +34,9 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV_DEV }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV_DEV }}
-        aws-region: ${{ env.AWS_DEFAULT_REGION_DEV_DEV }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION_DEV }}
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -63,7 +63,7 @@ jobs:
         --function-name ${{ env.AWS_LAMBDA_FUNC_NAME_DEV }} \
         --image-uri "${{ secrets.AWS_ECR_IMAGE_URI }}:${{ env.ECR_IMAGE_TAG }}"
       env:
-        DISCORD_PUBLIC_KEY_DEV_DEV: ${{ secrets.DISCORD_PUBLIC_KEY_DEV }}
+        DISCORD_PUBLIC_KEY_DEV: ${{ secrets.DISCORD_PUBLIC_KEY_DEV }}
         AWS_ACCESS_KEY_ID_DEV: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
         AWS_SECRET_ACCESS_KEY_DEV: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
         AWS_DEFAULT_REGION_DEV: ${{ env.AWS_DEFAULT_REGION_DEV }}
