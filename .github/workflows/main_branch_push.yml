@@ -1,22 +1,17 @@
-# ******************************************************** #
-# V2 of the AWS Lambda Deploy workflow adds caching the Docker image on AWS ECR so
-# subsequent runs of the workflow doesn't require rebuilding the image from scratch.
-# The Dockerfile is simple in this example, but a more production-grade Dockerfile
-# with linux packages to install, a lengthier requirements.txt file, etc. will
-# benenfit greatly from image caching.
-# ******************************************************** #
-
 # 이 작업은 이미지를 새로 만들지 않고, AWS ECR에서 또 다른 이름으로 레포를 만들어서
 # 이전에 만든 이미지를 저장함
 # 저장한 이미지는 캐시 용도로 사용되고, 빌드를 하는데 사용된다.
 
-name: AWS Lambda Deploy V2
+name: AWS Lambda Deploy - Main Branch
 
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#example-ignoring-paths
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths-ignore:
+      - ''
+  # pull_request:
+  #   branches: [ main ]
   workflow_dispatch:  # trigger manually
 
 jobs:
